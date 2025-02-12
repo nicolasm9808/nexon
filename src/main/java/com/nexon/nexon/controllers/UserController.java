@@ -3,16 +3,18 @@ package com.nexon.nexon.controllers;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import com.nexon.nexon.entities.User;
 import com.nexon.nexon.service.UserService;
-
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.validation.Valid;
 
+@Validated
 @RestController
+@ControllerAdvice
 @RequestMapping("/api/users")
 public class UserController {
 
@@ -26,7 +28,7 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<User> registerUser(@Valid @RequestBody User user) {
         User newUser = userService.registerUser(user);
-        return ResponseEntity.ok(newUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
     }
 
     // Get user by ID
