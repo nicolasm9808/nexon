@@ -1,5 +1,6 @@
 package com.nexon.nexon.service.impl;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.nexon.nexon.dto.UserRegistrationDTO;
 import com.nexon.nexon.dto.UserUpdateDTO;
 import com.nexon.nexon.entities.User;
 import com.nexon.nexon.repositories.UserRepository;
@@ -28,12 +30,23 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User registerUser(User user) {
-        if (userRepository.existsByUsername(user.getUsername()) || userRepository.existsByEmail(user.getEmail())) {
+    public User registerUser(UserRegistrationDTO userRegistrationDTO) {
+        if (userRegistrationDTO.getDateOfBirth().isAfter(LocalDate.now().minusYears(14))) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"User must be at least 14 years old");
+        }
+        if (userRepository.existsByUsername(userRegistrationDTO.getUsername()) || userRepository.existsByEmail(userRegistrationDTO.getEmail())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username or email already exists");
         }
 
-        user.setPassword(passwordEncoder.encode(user.getPassword())); // Encrypt password before saving
+        // Crear el usuario
+        User user = new User();
+        user.setFullName(userRegistrationDTO.getFullName());
+        user.setUsername(userRegistrationDTO.getUsername());
+        user.setPhoneNumber(userRegistrationDTO.getPhoneNumber());
+        user.setEmail(userRegistrationDTO.getEmail());
+        user.setPassword(passwordEncoder.encode(userRegistrationDTO.getPassword()));
+        user.setDateOfBirth(userRegistrationDTO.getDateOfBirth());
+
         return userRepository.save(user);
     }
 
@@ -51,16 +64,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public Optional<User> getUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
-        
+
     @Override
     public User updateUser(Long id, UserUpdateDTO userUpdateDTO) {
         Optional<User> existingUserOpt = userRepository.findById(id);
         if (existingUserOpt.isEmpty()) {
             throw new IllegalArgumentException("User not found");
         }
-    
+
         User existingUser = existingUserOpt.get();
-    
+
         if (userUpdateDTO.getFullName() != null) {
             existingUser.setFullName(userUpdateDTO.getFullName());
         }
@@ -70,7 +83,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         if (userUpdateDTO.getProfilePicture() != null) {
             existingUser.setProfilePicture(userUpdateDTO.getProfilePicture());
         }
-    
+
         return userRepository.save(existingUser);
     }
 
