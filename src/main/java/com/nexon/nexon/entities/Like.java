@@ -1,5 +1,7 @@
 package com.nexon.nexon.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -7,7 +9,9 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "likes")
+@Table(name = "likes", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"user_id", "post_id"})
+})
 public class Like {
 
     @Id
@@ -20,5 +24,6 @@ public class Like {
 
     @ManyToOne
     @JoinColumn(name = "post_id", nullable = false)
+    @JsonIgnore
     private Post post;
 }

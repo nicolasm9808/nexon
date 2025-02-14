@@ -1,5 +1,6 @@
 package com.nexon.nexon.entities;
 
+import java.util.Date;
 import java.util.List;
 
 import jakarta.persistence.*;
@@ -42,5 +43,5 @@ public class Post {
     @OneToMany(mappedBy = "post")
     private List<Notification> notifications;
 
-    private java.util.Date createdAt = new java.util.Date(); // Store creation date
+    private Date createdAt = new Date(); // Store creation date
 }

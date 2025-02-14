@@ -1,8 +1,14 @@
 package com.nexon.nexon.entities;
 
-import lombok.*;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
+import lombok.*;
+
+import java.util.Date;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Data
@@ -15,8 +21,11 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Size(max = 300, message = "Comment cannot exceed 300 characters")
+    @NotEmpty(message = "Comment cannot be empty")
+    @Size(max = 200, message = "Comment cannot exceed 200 characters")
     private String text;
+
+    private Date createdAt;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -24,5 +33,9 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "post_id", nullable = false)
+    @JsonIgnore
     private Post post;
+
+    @ElementCollection
+    private List<String> mentions; // Stores usernames of mentioned users
 }

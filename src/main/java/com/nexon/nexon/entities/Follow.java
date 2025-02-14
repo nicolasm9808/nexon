@@ -7,7 +7,7 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "likes")
+@Table(name = "follows")
 public class Follow {
 
     @Id

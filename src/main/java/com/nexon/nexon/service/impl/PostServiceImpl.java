@@ -7,6 +7,7 @@ import com.nexon.nexon.service.PostService;
 import com.nexon.nexon.service.UserService;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,7 +33,7 @@ public class PostServiceImpl implements PostService {
     
         // Set the user to the post
         post.setUser(user);
-        post.setCreatedAt(new java.util.Date()); // Set current date for post creation
+        post.setCreatedAt(new Date()); // Set current date for post creation
         post.setTotalComments(0L); // Initialize comment count
         post.setTotalLikes(0L); // Initialize like count
         return postRepository.save(post);
