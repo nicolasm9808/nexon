@@ -1,6 +1,7 @@
 package com.nexon.nexon.entities;
 
 import java.util.List;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
@@ -23,6 +24,11 @@ public class Post {
 
     private String imageUrl;
 
+    private String tags; // Store tags as a comma-separated string or use another method
+
+    private Long totalComments = 0L;
+    private Long totalLikes = 0L;
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -36,6 +42,5 @@ public class Post {
     @OneToMany(mappedBy = "post")
     private List<Notification> notifications;
 
-    private Long totalComments;
-    private Long totalLikes;
+    private java.util.Date createdAt = new java.util.Date(); // Store creation date
 }

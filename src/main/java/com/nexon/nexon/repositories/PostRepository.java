@@ -1,12 +1,16 @@
 package com.nexon.nexon.repositories;
 
+import com.nexon.nexon.entities.Post;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
 import java.util.List;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-
-import com.nexon.nexon.entities.Post;
-import com.nexon.nexon.entities.User;
-
 public interface PostRepository extends JpaRepository<Post, Long> {
-    List<Post> findByUser(User user);
+
+    List<Post> findAllByOrderByCreatedAtAsc(); // Orden cronológico ascendente
+    List<Post> findAllByOrderByCreatedAtDesc(); // Orden cronológico descendente
+
+    @Query("SELECT p FROM Post p ORDER BY (p.totalLikes + p.totalComments) DESC") // Orden por relevancia
+    List<Post> findPostsOrderedByRelevance();
 }
