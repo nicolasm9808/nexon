@@ -83,6 +83,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         if (userUpdateDTO.getProfilePicture() != null) {
             existingUser.setProfilePicture(userUpdateDTO.getProfilePicture());
         }
+        if (userUpdateDTO.getPhoneNumber() != null) {
+            existingUser.setPhoneNumber(userUpdateDTO.getPhoneNumber());
+        }
 
         return userRepository.save(existingUser);
     }
