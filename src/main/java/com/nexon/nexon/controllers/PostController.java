@@ -46,4 +46,11 @@ public class PostController {
     public ResponseEntity<List<Post>> getAllPosts(@RequestParam(required = false) String orderBy) {
         return ResponseEntity.ok(postService.getAllPosts(orderBy));
     }
+
+    @GetMapping("/feed")
+    public ResponseEntity<List<Post>> getFeed(Authentication authentication) {
+        String username = authentication.getName();
+        List<Post> feed = postService.getFeed(username);
+        return ResponseEntity.ok(feed);
+    }
 }

@@ -9,4 +9,5 @@ public interface PostService {
     Post updatePost(Long postId, Post post, String username);
     void deletePost(Long postId, String username);
     List<Post> getAllPosts(String orderBy);
+    List<Post> getFeed(String username);
 }

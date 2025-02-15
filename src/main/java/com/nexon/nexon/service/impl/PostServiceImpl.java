@@ -2,10 +2,12 @@ package com.nexon.nexon.service.impl;
 
 import com.nexon.nexon.entities.Post;
 import com.nexon.nexon.entities.User;
+import com.nexon.nexon.repositories.FollowRepository;
 import com.nexon.nexon.repositories.PostRepository;
 import com.nexon.nexon.service.PostService;
 import com.nexon.nexon.service.UserService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -16,10 +18,12 @@ public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
     private final UserService userService;
+    private final FollowRepository followRepository;
 
-    public PostServiceImpl(PostRepository postRepository, UserService userService) {
+    public PostServiceImpl(PostRepository postRepository, UserService userService, FollowRepository followRepository) {
         this.postRepository = postRepository;
         this.userService = userService;
+        this.followRepository = followRepository;
     }
 
     @Override
@@ -92,5 +96,18 @@ public class PostServiceImpl implements PostService {
         }
         // Default: Return all posts
         return postRepository.findAll();
+    }
+
+    @Override
+    @Transactional
+    public List<Post> getFeed(String username) {
+        // Find the user based on the username
+        Optional<User> userOptional = userService.getUserByUsername(username);
+        if (userOptional.isEmpty()) {
+            throw new RuntimeException("User not found");
+        }
+        User user = userOptional.get();  // Extract the user from the Optional
+        List<Long> followingUserIds = followRepository.findFollowingIdsByFollower(user);
+        return postRepository.findByUserIdInOrderByCreatedAtDesc(followingUserIds);
     }
 }

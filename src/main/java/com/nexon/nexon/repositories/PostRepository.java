@@ -13,4 +13,5 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query("SELECT p FROM Post p ORDER BY (p.totalLikes + p.totalComments) DESC") // Orden por relevancia
     List<Post> findPostsOrderedByRelevance();
+    List<Post> findByUserIdInOrderByCreatedAtDesc(List<Long> UserIds);
 }
