@@ -9,6 +9,7 @@ import com.nexon.nexon.entities.User;
 import com.nexon.nexon.repositories.NotificationRepository;
 import com.nexon.nexon.repositories.UserRepository;
 import com.nexon.nexon.service.NotificationService;
+import com.nexon.nexon.service.NotificationWebSocketService;
 
 import org.springframework.stereotype.Service;
 
@@ -16,10 +17,12 @@ import org.springframework.stereotype.Service;
 public class NotificationServiceImpl implements NotificationService{
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
+    private final NotificationWebSocketService notificationWebSocketService;
 
-    public NotificationServiceImpl(NotificationRepository notificationRepository, UserRepository userRepository) {
+    public NotificationServiceImpl(NotificationRepository notificationRepository, UserRepository userRepository, NotificationWebSocketService notificationWebSocketService) {
         this.notificationRepository = notificationRepository;
         this.userRepository = userRepository;
+        this.notificationWebSocketService = notificationWebSocketService;
     }
 
     @Override
@@ -31,6 +34,7 @@ public class NotificationServiceImpl implements NotificationService{
         notification.setMessage(message);
         notification.setPost(post);
         notificationRepository.save(notification);
+        notificationWebSocketService.sendNotification(recipient.getId(), notification);
     }
 
     @Override
