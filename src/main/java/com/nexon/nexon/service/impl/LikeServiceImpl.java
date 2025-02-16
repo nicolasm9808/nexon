@@ -1,11 +1,13 @@
 package com.nexon.nexon.service.impl;
 
 import com.nexon.nexon.entities.Like;
+import com.nexon.nexon.entities.NotificationType;
 import com.nexon.nexon.entities.Post;
 import com.nexon.nexon.entities.User;
 import com.nexon.nexon.repositories.LikeRepository;
 import com.nexon.nexon.repositories.PostRepository;
 import com.nexon.nexon.service.LikeService;
+import com.nexon.nexon.service.NotificationService;
 import com.nexon.nexon.service.UserService;
 import org.springframework.stereotype.Service;
 
@@ -17,11 +19,13 @@ public class LikeServiceImpl implements LikeService {
     private final LikeRepository likeRepository;
     private final PostRepository postRepository;
     private final UserService userService;
+    private final NotificationService notificationService;
 
-    public LikeServiceImpl(LikeRepository likeRepository, PostRepository postRepository, UserService userService) {
+    public LikeServiceImpl(LikeRepository likeRepository, PostRepository postRepository, UserService userService, NotificationService notificationService) {
         this.likeRepository = likeRepository;
         this.postRepository = postRepository;
         this.userService = userService;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -51,6 +55,15 @@ public class LikeServiceImpl implements LikeService {
             likeRepository.save(like);
             post.setTotalLikes(post.getTotalLikes() + 1);
             postRepository.save(post);
+
+            // Notificar al dueño del post
+             if (!post.getUser().equals(user)) {
+                 notificationService.createNotification(
+                         post.getUser(), user, NotificationType.LIKE,
+                         user.getUsername() + " liked your post", post
+                 );
+             }
+
             return true; // Like added
         }
     }

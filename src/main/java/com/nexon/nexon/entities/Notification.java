@@ -3,6 +3,9 @@ package com.nexon.nexon.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -14,15 +17,25 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String message;
-
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne
+    @JoinColumn(name = "triggered_by_id", nullable = false)
+    private User triggeredBy;
+
+    @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "post_id", nullable = true)
     private Post post;
 
-    private Boolean read = false;
+    @Enumerated(EnumType.STRING)
+    private NotificationType type;
+
+    private String message;
+
+    private boolean isRead = false;
+
+    private Date createdAt = new Date();
 }

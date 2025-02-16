@@ -1,11 +1,13 @@
 package com.nexon.nexon.service.impl;
 
 import com.nexon.nexon.entities.Comment;
+import com.nexon.nexon.entities.NotificationType;
 import com.nexon.nexon.entities.Post;
 import com.nexon.nexon.entities.User;
 import com.nexon.nexon.repositories.CommentRepository;
 import com.nexon.nexon.repositories.PostRepository;
 import com.nexon.nexon.service.CommentService;
+import com.nexon.nexon.service.NotificationService;
 import com.nexon.nexon.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,11 +22,13 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserService userService;
+    private final NotificationService notificationService;
 
-    public CommentServiceImpl(CommentRepository commentRepository, PostRepository postRepository, UserService userService) {
+    public CommentServiceImpl(CommentRepository commentRepository, PostRepository postRepository, UserService userService, NotificationService notificationService) {
         this.commentRepository = commentRepository;
         this.postRepository = postRepository;
         this.userService = userService;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -55,6 +59,27 @@ public class CommentServiceImpl implements CommentService {
         // Update total comments in the post
         post.setTotalComments(post.getTotalComments() + 1);
         postRepository.save(post);
+
+        // Notify post owner
+        if (!post.getUser().equals(user)) {
+            notificationService.createNotification(
+                    post.getUser(), user, NotificationType.COMMENT,
+                    user.getUsername() + " commented on your post", post
+            );
+        }
+
+        // Notify mentioned users
+        for (String mentionedUsername : mentions) {
+            Optional<User> mentionedUserOptional = userService.getUserByUsername(mentionedUsername);
+            mentionedUserOptional.ifPresent(mentionedUser -> {
+                if (!mentionedUser.equals(user)){
+                    notificationService.createNotification(
+                            mentionedUser, user, NotificationType.MENTION,
+                            user.getUsername() + " mentioned you in a comment", post
+                    );
+                }
+            });
+        }
 
         return comment;
     }

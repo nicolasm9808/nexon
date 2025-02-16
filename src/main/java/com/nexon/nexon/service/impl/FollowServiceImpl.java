@@ -8,10 +8,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.nexon.nexon.entities.Follow;
+import com.nexon.nexon.entities.NotificationType;
 import com.nexon.nexon.entities.User;
 import com.nexon.nexon.repositories.FollowRepository;
 import com.nexon.nexon.repositories.UserRepository;
 import com.nexon.nexon.service.FollowService;
+import com.nexon.nexon.service.NotificationService;
 import com.nexon.nexon.service.UserService;
 
 @Service
@@ -19,11 +21,13 @@ public class FollowServiceImpl implements FollowService {
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
     private final UserService userService;
+    private final NotificationService notificationService;
 
-    public FollowServiceImpl(FollowRepository followRepository, UserRepository userRepository, UserService userService) {
+    public FollowServiceImpl(FollowRepository followRepository, UserRepository userRepository, UserService userService, NotificationService notificationService) {
         this.followRepository = followRepository;
         this.userRepository = userRepository;
         this.userService = userService;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -35,6 +39,7 @@ public class FollowServiceImpl implements FollowService {
             throw new RuntimeException("User not found");
         }
         User user = userOptional.get();  // Extract the user from the Optional
+
         if (followingId.equals(user.getId())) {
             throw new RuntimeException("You cannot follow yourself");
         }
@@ -52,6 +57,11 @@ public class FollowServiceImpl implements FollowService {
         follow.setFollowing(following);
         
         follow = followRepository.save(follow);
+
+        notificationService.createNotification(
+        following, user, NotificationType.FOLLOW,
+        user.getUsername() + " started following you", null
+        );
     }
     
     @Override
