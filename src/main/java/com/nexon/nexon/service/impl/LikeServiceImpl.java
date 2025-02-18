@@ -11,6 +11,8 @@ import com.nexon.nexon.service.NotificationService;
 import com.nexon.nexon.service.UserService;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -67,4 +69,17 @@ public class LikeServiceImpl implements LikeService {
             return true; // Like added
         }
     }
+
+    @Override
+    public List<String> getUsersWhoLikedPost(Long postId) {
+        List<Like> likes = likeRepository.findByPostId(postId);
+        List<String> usernames = new ArrayList<>();
+        
+        for (Like like : likes) {
+            usernames.add(like.getUser().getUsername());
+        }
+        
+        return usernames;
+    }
+
 }
