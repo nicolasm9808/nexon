@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 import com.nexon.nexon.security.JwtAuthenticationEntryPoint;
 import com.nexon.nexon.security.JwtAuthenticationFilter;
@@ -20,11 +21,14 @@ public class SecurityConfig {
 
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CorsConfigurationSource corsConfigurationSource;
 
     public SecurityConfig(@Lazy JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
-                        @Lazy JwtAuthenticationFilter jwtAuthenticationFilter) {
+                        @Lazy JwtAuthenticationFilter jwtAuthenticationFilter,
+                        CorsConfigurationSource corsConfigurationSource) {
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.corsConfigurationSource = corsConfigurationSource;
     }
 
     @Bean
@@ -36,7 +40,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/login", "/api/users/register").permitAll()  // Public endpoints
                 .anyRequest().authenticated()
-            );
+            )
+            .cors(cors -> cors.configurationSource(corsConfigurationSource));  // Configura CORS
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
