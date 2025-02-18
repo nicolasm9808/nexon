@@ -32,13 +32,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public User registerUser(UserRegistrationDTO userRegistrationDTO) {
         if (userRegistrationDTO.getDateOfBirth().isAfter(LocalDate.now().minusYears(14))) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"User must be at least 14 years old");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User must be at least 14 years old");
         }
-        if (userRepository.existsByUsername(userRegistrationDTO.getUsername()) || userRepository.existsByEmail(userRegistrationDTO.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username or email already exists");
+        if (userRepository.existsByUsername(userRegistrationDTO.getUsername())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username already exists");
+        }
+        if (userRepository.existsByEmail(userRegistrationDTO.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already exists");
         }
 
-        // Crear el usuario
+        // Create a new user
         User user = new User();
         user.setFullName(userRegistrationDTO.getFullName());
         user.setUsername(userRegistrationDTO.getUsername());

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 
-@Controller
+@Controller("/api")
 public class NotificationController {
 
     private final NotificationService notificationService;
@@ -21,7 +21,7 @@ public class NotificationController {
         this.notificationService = notificationService;
     }
 
-    @GetMapping("/api/notifications")
+    @GetMapping("/notifications")
     public ResponseEntity<List<Notification>> getUserNotifications(Authentication authentication) {
         String username = authentication.getName();
         return ResponseEntity.ok(notificationService.getUserNotifications(username));

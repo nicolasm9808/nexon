@@ -30,6 +30,7 @@ public class AuthController {
         );
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String token = jwtUtil.generateToken(userDetails.getUsername());
+        System.out.println("Login successful to:" + user.getUsername());
         return ResponseEntity.ok("Bearer " + token);
     }
 }
