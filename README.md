@@ -102,7 +102,7 @@ Authorization: Bearer <your_jwt_token>
 
 The API is fully documented using **Swagger**. You can explore all endpoints here:  
 
-🔗 **[API Documentation (Swagger UI)](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/nicolasm9808/nexon/main/docs/LuisNicolasMendezPalacios-nexon-1.0.0.yaml)**  
+🔗 [🚀 View API Documentation in Swagger UI](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/nicolasm9808/nexon/main/openapi.yaml)
 
 ---
 
