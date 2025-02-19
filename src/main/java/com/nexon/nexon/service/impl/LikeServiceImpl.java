@@ -82,4 +82,18 @@ public class LikeServiceImpl implements LikeService {
         return usernames;
     }
 
+    @Override
+    public boolean hasUserLikedPost(Long postId, String username) {
+        Optional<User> userOptional = userService.getUserByUsername(username);
+        if (userOptional.isEmpty()) {
+            throw new RuntimeException("User not found");
+        }
+        User user = userOptional.get();
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+    
+        return likeRepository.findByUserAndPost(user, post).isPresent();
+    }
+    
+
 }

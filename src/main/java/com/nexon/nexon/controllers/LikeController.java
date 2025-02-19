@@ -31,4 +31,12 @@ public class LikeController {
         return ResponseEntity.ok(users);
     }
 
+    @GetMapping("/{postId}/liked")
+    public ResponseEntity<Boolean> hasUserLikedPost(@PathVariable Long postId, Authentication authentication) {
+        String username = authentication.getName();
+        boolean hasLiked = likeService.hasUserLikedPost(postId, username);
+        return ResponseEntity.ok(hasLiked);
+    }
+    
+
 }
