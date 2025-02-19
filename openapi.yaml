@@ -1,0 +1,747 @@
+openapi: 3.0.3
+info:
+  title: Nexon API
+  description: API documentation for Nexon user management endpoints.
+  version: 1.0.0
+servers:
+- url: http://localhost:8081/api
+  description: Local development server
+paths:
+  /users/register:
+    post:
+      summary: Register a new user
+      description: Creates a new user account.
+      operationId: registerUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserRegistrationDTO"
+        required: true
+      responses:
+        "201":
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Validation error
+  /users/{id}:
+    get:
+      summary: Get user by ID
+      description: Retrieves user information by ID.
+      operationId: getUserById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: User retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: User not found
+    delete:
+      summary: Delete user
+      description: Deletes a user account.
+      operationId: deleteUser
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "204":
+          description: User deleted successfully
+        "403":
+          description: Forbidden - Cannot delete another user's account
+        "404":
+          description: User not found
+    patch:
+      summary: Update user profile
+      description: Updates user profile data (partial update).
+      operationId: updateUser
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdateDTO"
+        required: true
+      responses:
+        "200":
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Validation error
+        "403":
+          description: Forbidden - Cannot update another user's account
+  /users/username/{username}:
+    get:
+      summary: Get user by username
+      description: Retrieves user profile information by username.
+      operationId: getUserByUsername
+      parameters:
+      - name: username
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfileResponse"
+        "404":
+          description: User not found
+  /users:
+    get:
+      summary: Get all users
+      description: Retrieves a list of all users.
+      operationId: getAllUsers
+      responses:
+        "200":
+          description: List of users retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+  /users/me:
+    get:
+      summary: Get authenticated user
+      description: Retrieves the profile of the currently authenticated user.
+      operationId: getAuthenticatedUser
+      responses:
+        "200":
+          description: Authenticated user profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfileResponse"
+        "404":
+          description: User not found
+  /posts/create:
+    post:
+      summary: Create a new post
+      description: Allows authenticated users to create a new post.
+      operationId: createPost
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Post"
+        required: true
+      responses:
+        "200":
+          description: Post created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        "400":
+          description: Validation error
+        "401":
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+  /posts/{postId}:
+    delete:
+      summary: Delete a post
+      description: Allows the owner of a post to delete it.
+      operationId: deletePost
+      parameters:
+      - name: postId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Post deleted successfully
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden - Cannot delete another user's post
+        "404":
+          description: Post not found
+      security:
+      - bearerAuth: []
+    patch:
+      summary: Update a post
+      description: Allows the owner of a post to update it.
+      operationId: updatePost
+      parameters:
+      - name: postId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Post"
+        required: true
+      responses:
+        "200":
+          description: Post updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden - Cannot update another user's post
+        "404":
+          description: Post not found
+      security:
+      - bearerAuth: []
+  /posts/all:
+    get:
+      summary: Get all posts
+      description: "Retrieves a list of all posts, optionally ordered."
+      operationId: getAllPosts
+      parameters:
+      - name: orderBy
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - date
+          - popularity
+      responses:
+        "200":
+          description: List of posts retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Post"
+  /posts/feed:
+    get:
+      summary: Get user feed
+      description: Retrieves posts from followed users.
+      operationId: getFeed
+      responses:
+        "200":
+          description: Feed retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Post"
+        "401":
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+  /comments/{postId}:
+    get:
+      summary: Get comments for a post
+      description: Retrieves all comments for a specific post.
+      operationId: getComments
+      parameters:
+      - name: postId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: List of comments retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Comment"
+        "404":
+          description: Post not found
+    post:
+      summary: Add a comment to a post
+      description: Allows an authenticated user to add a comment to a specific post.
+      operationId: addComment
+      parameters:
+      - name: postId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommentRequest"
+        required: true
+      responses:
+        "200":
+          description: Comment added successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Comment"
+        "400":
+          description: Validation error
+        "401":
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+  /comments/{commentId}:
+    delete:
+      summary: Delete a comment
+      description: Allows the owner of a comment to delete it.
+      operationId: deleteComment
+      parameters:
+      - name: commentId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Comment deleted successfully
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden - Cannot delete another user's comment
+        "404":
+          description: Comment not found
+      security:
+      - bearerAuth: []
+  /likes/{postId}:
+    get:
+      summary: Get users who liked a post
+      description: Retrieves a list of usernames who liked a specific post.
+      operationId: getUsersWhoLikedPost
+      parameters:
+      - name: postId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: List of users who liked the post
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        "404":
+          description: Post not found
+    post:
+      summary: Toggle like on a post
+      description: Allows an authenticated user to like or unlike a post.
+      operationId: toggleLike
+      parameters:
+      - name: postId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Like status updated
+          content:
+            text/plain:
+              schema:
+                type: string
+                enum:
+                - Liked
+                - Unliked
+        "401":
+          description: Unauthorized
+        "404":
+          description: Post not found
+      security:
+      - bearerAuth: []
+  /likes/{postId}/liked:
+    get:
+      summary: Check if a user liked a post
+      description: Returns whether the authenticated user has liked a specific post.
+      operationId: hasUserLikedPost
+      parameters:
+      - name: postId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Like status retrieved
+          content:
+            application/json:
+              schema:
+                type: boolean
+        "401":
+          description: Unauthorized
+        "404":
+          description: Post not found
+      security:
+      - bearerAuth: []
+  /follow/{followingId}:
+    post:
+      summary: Follow a user
+      description: Allows an authenticated user to follow another user.
+      operationId: followUser
+      parameters:
+      - name: followingId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Successfully followed the user
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: You are now following this user
+        "401":
+          description: Unauthorized
+        "404":
+          description: User not found
+      security:
+      - bearerAuth: []
+    delete:
+      summary: Unfollow a user
+      description: Allows an authenticated user to unfollow another user.
+      operationId: unfollowUser
+      parameters:
+      - name: followingId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Successfully unfollowed the user
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: You have unfollowed this user
+        "401":
+          description: Unauthorized
+        "404":
+          description: User not found
+      security:
+      - bearerAuth: []
+  /follow/followers/{userId}:
+    get:
+      summary: Get followers of a user
+      description: Retrieves a list of users who are following the specified user.
+      operationId: getFollowers
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: List of followers retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        "404":
+          description: User not found
+  /follow/following/{userId}:
+    get:
+      summary: Get users followed by a user
+      description: Retrieves a list of users that the specified user is following.
+      operationId: getFollowing
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: List of following users retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        "404":
+          description: User not found
+  /follow/isFollowing/{userId}:
+    get:
+      summary: Check if authenticated user is following a specific user
+      description: Returns whether the authenticated user is following the specified
+        user.
+      operationId: isFollowing
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Following status retrieved
+          content:
+            application/json:
+              schema:
+                type: boolean
+        "401":
+          description: Unauthorized
+        "404":
+          description: User not found
+      security:
+      - bearerAuth: []
+  /notifications:
+    get:
+      summary: Get user notifications
+      description: Retrieves a list of notifications for the authenticated user.
+      operationId: getUserNotifications
+      responses:
+        "200":
+          description: List of notifications retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notification"
+        "401":
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+  /notifications/unread:
+    get:
+      summary: Get unread notifications
+      description: Retrieves a list of unread notifications for the authenticated
+        user.
+      operationId: getUnreadNotifications
+      responses:
+        "200":
+          description: List of unread notifications retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notification"
+        "401":
+          description: Unauthorized
+      security:
+      - bearerAuth: []
+  /notifications/{id}/read:
+    patch:
+      summary: Mark a notification as read
+      description: Marks a specific notification as read for the authenticated user.
+      operationId: markNotificationAsRead
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Notification marked as read successfully
+        "401":
+          description: Unauthorized
+        "404":
+          description: Notification not found
+      security:
+      - bearerAuth: []
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        username:
+          type: string
+        email:
+          type: string
+        fullName:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    UserRegistrationDTO:
+      type: object
+      properties:
+        username:
+          type: string
+          example: johndoe
+        email:
+          type: string
+          example: johndoe@example.com
+        password:
+          type: string
+          example: StrongPassword123!
+    UserUpdateDTO:
+      type: object
+      properties:
+        fullName:
+          type: string
+          example: John Doe
+        email:
+          type: string
+          example: newemail@example.com
+        password:
+          type: string
+          example: NewStrongPassword123!
+    UserProfileResponse:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        followersCount:
+          type: integer
+        followingCount:
+          type: integer
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        author:
+          $ref: "#/components/schemas/User"
+    CommentRequest:
+      type: object
+      properties:
+        text:
+          type: string
+          example: This is a comment.
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        text:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        author:
+          $ref: "#/components/schemas/User"
+        postId:
+          type: integer
+          format: int64
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        message:
+          type: string
+        type:
+          type: string
+          enum:
+          - LIKE
+          - COMMENT
+          - FOLLOW
+          - MENTION
+        read:
+          type: boolean
+        timestamp:
+          type: string
+          format: date-time
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
