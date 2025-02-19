@@ -32,4 +32,12 @@ public class NotificationController {
     public Notification sendNotification(Notification notification) {
         return notification;
     }
+
+    @PatchMapping("/notifications/{id}/read")
+    public ResponseEntity<Void> markNotificationAsRead(@PathVariable Long id, Authentication authentication) {
+        String username = authentication.getName();
+        notificationService.markAsRead(id, username);
+        return ResponseEntity.ok().build();
+    }
+    
 }

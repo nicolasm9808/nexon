@@ -10,4 +10,5 @@ import com.nexon.nexon.entities.User;
 public interface NotificationService {
     void createNotification(User recipient, User triggeredBy, NotificationType type, String message, Post post);
     List<Notification> getUserNotifications(String username);
+    void markAsRead(Long notificationId, String username);
 }
