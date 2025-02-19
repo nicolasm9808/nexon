@@ -6,13 +6,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 
-@Controller("/api")
+@RestController
+@RequestMapping("/api")
+
 public class NotificationController {
 
     private final NotificationService notificationService;
@@ -39,5 +40,5 @@ public class NotificationController {
         notificationService.markAsRead(id, username);
         return ResponseEntity.ok().build();
     }
-    
+
 }
