@@ -11,4 +11,5 @@ public interface NotificationService {
     void createNotification(User recipient, User triggeredBy, NotificationType type, String message, Post post);
     List<Notification> getUserNotifications(String username);
     void markAsRead(Long notificationId, String username);
+    List<Notification> getUnreadNotifications(String username);
 }

@@ -40,5 +40,11 @@ public class NotificationController {
         notificationService.markAsRead(id, username);
         return ResponseEntity.ok().build();
     }
+    @GetMapping("/notifications/unread")
+    public ResponseEntity<List<Notification>> getUnreadNotifications(Authentication authentication) {
+        String username = authentication.getName();
+        return ResponseEntity.ok(notificationService.getUnreadNotifications(username));
+    }
+
 
 }

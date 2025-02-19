@@ -48,13 +48,20 @@ public class NotificationServiceImpl implements NotificationService{
     public void markAsRead(Long notificationId, String username) {
         Notification notification = notificationRepository.findById(notificationId)
             .orElseThrow(() -> new RuntimeException("Notification not found"));
-    
+
         if (!notification.getUser().getUsername().equals(username)) {
             throw new RuntimeException("You can't mark this notification as read");
         }
-    
+
         notification.setRead(true);
         notificationRepository.save(notification);
+    }
+
+    @Override
+    public List<Notification> getUnreadNotifications(String username) {
+        User user = userRepository.findByUsername(username)
+        .orElseThrow(() -> new RuntimeException("User not found"));
+        return notificationRepository.findByUserAndIsReadFalse(user);
     }
 
 }
