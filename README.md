@@ -125,7 +125,7 @@ The frontend code is available at:
 
 A video demonstration of the Nexon platform is available here:  
 
-📹 **[Watch Demo Video]([https://drive.google.com/drive/folders/your_video_folder_id](https://drive.google.com/drive/folders/1Je47R5TEBaCrys_SAzHvSBJHyTS_1VrT?usp=sharing))**  
+📹 **[Watch Demo Video](https://drive.google.com/drive/folders/1Je47R5TEBaCrys_SAzHvSBJHyTS_1VrT?usp=sharing)**  
 
 ---
 
