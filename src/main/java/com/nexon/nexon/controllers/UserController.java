@@ -73,8 +73,6 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
     
-
-
     // Get all users
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
@@ -95,9 +93,7 @@ public class UserController {
         return ResponseEntity.ok(updatedUser);
     }
 
-
     // Delete user
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         String authenticatedUsername = getAuthenticatedUsername();
@@ -112,15 +108,18 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-
     // Get authenticated user
     @GetMapping("/me")
-    public ResponseEntity<User> getAuthenticatedUser() {
+    public ResponseEntity<UserProfileResponse> getAuthenticatedUser() {
         String authenticatedUsername = getAuthenticatedUsername();
         User user = userService.getUserByUsername(authenticatedUsername)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        return ResponseEntity.ok(user);
+        int followersCount = followService.getFollowers(user.getId()).size();
+        int followingCount = followService.getFollowing(user.getId()).size();
+    
+        UserProfileResponse response = new UserProfileResponse(user, followersCount, followingCount);
+        return ResponseEntity.ok(response);
     }
 
     // Utility method to get the authenticated user's username
