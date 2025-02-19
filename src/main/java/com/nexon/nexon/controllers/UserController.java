@@ -58,6 +58,14 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    @GetMapping("/username/{username}")
+    public ResponseEntity<User> getUserByUsername(@PathVariable String username) {
+        User user = userService.getUserByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        return ResponseEntity.ok(user);
+    }
+
+
     // Get all users
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
