@@ -9,4 +9,5 @@ public interface FollowService {
     void unfollowUser(Long followingId, String username);
     List<User> getFollowers(Long userId);
     List<User> getFollowing(Long userId);
+    boolean isFollowing(Long userId, String username);
 }

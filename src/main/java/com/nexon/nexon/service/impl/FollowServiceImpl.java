@@ -96,4 +96,16 @@ public class FollowServiceImpl implements FollowService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public boolean isFollowing(Long userId, String username) {
+        Optional<User> userOptional = userService.getUserByUsername(username);
+        if (userOptional.isEmpty()) {
+            throw new RuntimeException("User not found");
+        }
+        User user = userOptional.get();
+
+        return followRepository.existsByFollowerAndFollowing(user, userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found")));
+    }
+
 }

@@ -16,8 +16,9 @@ import org.springframework.web.bind.annotation.*;
 import com.nexon.nexon.dto.UserRegistrationDTO;
 import com.nexon.nexon.dto.UserUpdateDTO;
 import com.nexon.nexon.entities.User;
+import com.nexon.nexon.entities.UserProfileResponse;
+import com.nexon.nexon.service.FollowService;
 import com.nexon.nexon.service.UserService;
-
 import jakarta.validation.Valid;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -27,9 +28,11 @@ import org.springframework.web.server.ResponseStatusException;
 public class UserController {
 
     private final UserService userService;
+    private final FollowService followService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, FollowService followService) {
         this.userService = userService;
+        this.followService = followService;
     }
 
     // Register a new user
@@ -59,11 +62,17 @@ public class UserController {
     }
 
     @GetMapping("/username/{username}")
-    public ResponseEntity<User> getUserByUsername(@PathVariable String username) {
+    public ResponseEntity<UserProfileResponse> getUserByUsername(@PathVariable String username) {
         User user = userService.getUserByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        return ResponseEntity.ok(user);
+    
+        int followersCount = followService.getFollowers(user.getId()).size();
+        int followingCount = followService.getFollowing(user.getId()).size();
+    
+        UserProfileResponse response = new UserProfileResponse(user, followersCount, followingCount);
+        return ResponseEntity.ok(response);
     }
+    
 
 
     // Get all users
